@@ -7,23 +7,30 @@ import ForgotPassword from "./components/forgotPassword";
 import Home from "./pages/home";
 import CustomNavbar from "./components/navbar";
 import ProfilePage from "./pages/profile";
+import Footer from "./components/footer";
 
 function App() {
   return (
     <Router>
-      <Routes>
-        {/* Navigate root to auth page */}
-        <Route path="/" element={<Navigate to="/home" />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/navbar" element={<CustomNavbar />} />
-        <Route path="/auth/login" element={<Login />} />
-        <Route path="/auth/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/select-sub" element={<SubjectInput />} /> 
-        <Route path="/home" element={<Home />} />
-        <Route path="/profile" element={<ProfilePage />} />
-      </Routes>
+      <div className="app-container flex flex-col min-h-screen">
+        <div className="flex-grow">
+          <Routes>
+            {/* Navigate root to auth page */}
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/navbar" element={<CustomNavbar />} />
+            <Route path="/auth/login" element={<Login />} />
+            <Route path="/auth/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/select-sub" element={<SubjectInput />} /> 
+            <Route path="/home" element={<Home />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Routes>
+        </div>
+        <Footer />
+      </div>
     </Router>
+
   );
 }
 

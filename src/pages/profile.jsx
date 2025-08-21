@@ -19,6 +19,13 @@ const ProfilePage = () => {
   const [user, setUser] = useState(initialUser);
   const [formData, setFormData] = useState(initialUser);
   const [isEditing, setIsEditing] = useState(false);
+  const [subjects, setSubjects] = useState([]);
+
+  useEffect(() => {
+    const storedSubjects = JSON.parse(localStorage.getItem("subjects")) || [];
+    setSubjects(storedSubjects);
+  }, []);
+
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -49,12 +56,11 @@ const ProfilePage = () => {
   const isGuest = user.username === "Guest";
 
   return (
-    <div className="d-flex flex-column vh-100">
+    <div className="d-flex flex-column min-vh-100">
       <CustomNavbar />
 
       <div className="container my-4">
         <div className="card shadow p-4">
-          {/* Top row: icon + username + buttons */}
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div className="d-flex align-items-center">
               <FaUserCircle size={28} />
@@ -64,14 +70,12 @@ const ProfilePage = () => {
             </div>
 
             <div>
-              {/* Login button visible only if Guest */}
               {isGuest && (
                 <button className="btn btn-primary me-2" onClick={handleLogin}>
                   Login
                 </button>
               )}
 
-              {/* Edit button always visible but disabled if Guest */}
               <button
                 className="btn btn-secondary me-2"
                 onClick={handleEdit}
@@ -80,7 +84,6 @@ const ProfilePage = () => {
                 Edit
               </button>
 
-              {/* Save button only visible if editing and not Guest */}
               {isEditing && !isGuest && (
                 <button className="btn btn-success me-2" onClick={handleSave}>
                   Save
@@ -89,7 +92,6 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Form fields */}
           <form>
             <div className="mb-3">
               <label className="form-label">First Name</label>
@@ -139,26 +141,52 @@ const ProfilePage = () => {
               />
             </div>
 
-            <div className="mb-3 flex-wrap">
-              <label className="form-label">Year</label>
-              <input type="text" className="form-control" value={formData.year} disabled />
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <label className="form-label">Year</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.year}
+                  disabled
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Department</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.department}
+                  disabled
+                />
+              </div>
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Department</label>
-              <input type="text" className="form-control" value={formData.department} disabled />
+              <label className="font-semibold block mb-2">Subjects:</label>
+              <select className="form-control">
+                {subjects.length > 0 ? (
+                  subjects.map((sub, i) => (
+                    <option key={i} value={sub}>
+                      {sub}
+                    </option>
+                  ))
+                ) : (
+                  <option value="none">None</option>
+                )}
+              </select>
             </div>
 
-            {/* Change password always visible but disabled if Guest */}
             <button
               type="button"
-              className="btn w-20 mt-3 text-dark"
+              className="btn mt-3"
               onClick={handleChangePassword}
               disabled={isGuest}
             >
               Change Password
             </button>
           </form>
+
         </div>
       </div>
     </div>

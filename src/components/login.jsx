@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
 import ForgotPassword from "./forgotPassword";
 
+
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -72,6 +73,7 @@ const Login = () => {
           <ForgotPassword setShowForgot={setShowForgot} />
         )}
       </div>
+      
     </div>
   );
 };

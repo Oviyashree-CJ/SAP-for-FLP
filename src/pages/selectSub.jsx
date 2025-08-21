@@ -32,8 +32,8 @@ const SubjectInput = () => {
   const handleNamesSubmit = (e) => {
     e.preventDefault();
     if (subjects.every((s) => s.trim() !== "")) {
-      alert("Subjects submitted: " + subjects.join(", "));
-       navigate("/home");
+      localStorage.setItem("userSubjects", JSON.stringify(subjects));
+      navigate("/home"); 
     } else {
       alert("Please fill all subject names!");
     }

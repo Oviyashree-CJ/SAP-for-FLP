@@ -46,7 +46,7 @@ const Signup = () => {
       newErrors.email = "Invalid email format.";
     }
     if (!regex.phone.test(formData.phone)) {
-      newErrors.phone = "Phone must be a valid 10-digit number (starting 6-9).";
+      newErrors.phone = "Phone number must be a valid 10-digit number (starting 6-9).";
     }
     if (!regex.username.test(formData.username)) {
       newErrors.username =
@@ -58,12 +58,13 @@ const Signup = () => {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // true if no errors
+    return Object.keys(newErrors).length === 0; 
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
       console.log("Signup data:", formData);
       navigate("/select-sub");
     } else {
