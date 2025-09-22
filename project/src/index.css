@@ -1,0 +1,14 @@
+body {
+  margin: 0;
+  height: 100%;
+  color: #ad11b8ff !important;
+  font-weight: 700;
+  font-family: 'Merriweather Sans', cursive !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

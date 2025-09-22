@@ -1,0 +1,53 @@
+/* StudyScheduler.css */
+.progress-bar {
+  background-color: #ad11b8ff !important; /* exact purple */
+  color: white;
+  font-weight: bold;
+}
+
+button.btn-primary,
+button.btn-success {
+  background-color: #ad11b8ff !important;
+  border: 1px solid white;
+  color: white;
+}
+
+.gantt-segment {
+  /* Gantt segments for completed subjects */
+  background-color: #ad11b8ff !important;
+}
+.alert-success-popup {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ad11b8ff;
+  color: white;
+  border: 1px solid white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  text-align: center;
+  z-index: 999;
+  opacity: 0;
+  animation: fadeInOut 2s forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
