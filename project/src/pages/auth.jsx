@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getUserProfile } from "../services/api";
+import { getCurrentUser } from "../services/api"; // use /auth/me instead
 import Login from "../components/login";
 import Signup from "../components/signup";
 
@@ -10,21 +10,18 @@ const Auth = () => {
   const [loading, setLoading] = useState(true);
 
   // Decide which form to show based on URL
-  const isLogin = location.pathname.includes("login"); // true for /auth/login, false for /auth/signup
+  const isLogin = location.pathname.includes("login");
 
   useEffect(() => {
     const checkLogin = async () => {
-      const userId = localStorage.getItem("user_id");
-      if (userId) {
-        try {
-          const res = await getUserProfile(userId);
-          if (res.data.login === "yes") {
-            navigate("/dashboard"); // redirect if already logged in
-            return;
-          }
-        } catch (err) {
-          console.error("Error checking login:", err);
+      try {
+        const res = await getCurrentUser();
+        if (res?.authenticated && res.user?.login === "yes") {
+          navigate("/dashboard"); // redirect if already logged in
+          return;
         }
+      } catch (err) {
+        console.error("Error checking login:", err);
       }
       setLoading(false); // show Auth page if not logged in
     };
@@ -32,7 +29,7 @@ const Auth = () => {
     checkLogin();
   }, [navigate]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="text-center mt-5">Loading...</p>;
 
   return (
     <div className="container mt-5">

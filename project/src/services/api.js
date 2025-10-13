@@ -1,35 +1,25 @@
+// src/services/api.js
 import axios from "axios";
 
-export const API = axios.create({
-  baseURL: "http://127.0.0.1:5000", // Flask backend
+const API = axios.create({
+  baseURL: "http://127.0.0.1:5000", // update if different
+  withCredentials: true, // crucial for Flask session cookies
 });
 
-API.defaults.withCredentials = true;
-
-// Add token automatically
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");  
-  if (token) {
-    if (!config.headers) {
-      config.headers = {};
+export const signupUser = (data) => API.post("/auth/signup", data, { withCredentials: true });
+export const loginUser = (data) => API.post("/auth/login", data, { withCredentials: true });
+export const logoutUser = () => API.post("/auth/logout");
+export const getCurrentUser = async () => {try {
+    const res = await API.get("/auth/me", { withCredentials: true });
+    return res.data; // direct JSON
+  } catch (err) {
+    if (err.response && err.response.status === 401) {
+      return null;  // not logged in
     }
-    config.headers["Authorization"] = `Bearer ${token.trim()}`;
-    console.log("Attached token:", token);
+    throw err;
   }
-  return config;
-});
-
-// --- Auth services ---
-export const getUserProfile = () => API.get("/auth/profile");
-export const updateUserProfile = (data) => API.put("/auth/profile", data);
-export const loginUser = async (data) => {
-  const res = await API.post("/auth/login", data);
-  localStorage.setItem("token", res.data.token); 
-  return res;
 };
+export const updateUserProfile = (data) => API.put("/profile", data);
 
-export const signupUser = (data) => API.post("/auth/register", data);
-
-export const logoutUser = () =>
-  API.post("/auth/logout");
-
+// add other endpoints below (progress, rewards, summaries, etc.)
+export default API;

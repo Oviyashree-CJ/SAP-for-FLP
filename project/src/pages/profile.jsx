@@ -1,26 +1,47 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import CustomNavbar from "../components/navbar";
-import { getUserProfile, updateUserProfile } from "../services/api";
-import { UserContext } from "../context/UserContext";
+import { getCurrentUser, updateUserProfile } from "../services/api";
+import Logout from "../pages/signout";
+import initialUser from "../context/initialUser";
 
 const ProfilePage = () => {
-const { user, setUser, loading } = useContext(UserContext);
   const navigate = useNavigate();
-  const [formData, setFormData] = useState(user);
+  const [user, setUser] = useState(initialUser);
+  const [formData, setFormData] = useState(initialUser);
+  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    setFormData(user);
-  }, [user]);
+    const fetchProfile = async () => {
+      try {
+        const res = await getCurrentUser();
+        if(res && res.authenticated){
+          setUser(res.user);
+          setFormData(res.user);
+        }
+        else{
+          setUser(initialUser);
+          setFormData(initialUser);
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleSave = async () => {
     try {
       await updateUserProfile(formData);
-      const res = await getUserProfile();
-      setUser(res.data);
-      setFormData(res.data);
+      const res = await getCurrentUser();
+      if (res && res.authenticated) {
+        setUser(res.user);
+        setFormData(res.user);
+      }
       setIsEditing(false);
       alert("Profile updated successfully!");
     } catch (err) {
@@ -38,7 +59,6 @@ const { user, setUser, loading } = useContext(UserContext);
     return <p className="text-center mt-5">Loading profile...</p>;
   }
 
-  const handleLogin = () => navigate("/auth/login");
   const handleChangePassword = () => navigate("/forgot-password");
   const isGuest = user.username === "Guest";
 
@@ -55,10 +75,9 @@ const { user, setUser, loading } = useContext(UserContext);
             </div>
 
             <div>
-              {isGuest && (
-                <button className="text-light btn me-2" onClick={handleLogin} style={{ backgroundColor: "#ad11b8ff" }}>
-                  Login
-                </button>
+              {!isGuest && (
+                  <Logout />
+
               )} 
               <button className="btn btn-primary me-2"
                       onClick={() => setIsEditing(true)}

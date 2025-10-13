@@ -10,7 +10,7 @@ function MiniGame() {
     <div className="text-center">
       <p>Click the button as many times as you can in your break!</p>
       <button className="btn btn-success" onClick={handleClick}>
-        🎯 Click Me!
+        Click Me!
       </button>
       <p className="mt-2">Your Score: {score}</p>
     </div>

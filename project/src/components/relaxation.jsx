@@ -4,7 +4,6 @@ import { Modal, Button, ProgressBar } from "react-bootstrap";
 import MiniGame from "./miniGame";
 import MeditationVideo from "./meditation";
 import FunFacts from "./funFacts";
-import FocusTracker from "../context/FocusTracker";
 
 function RelaxationModal({ show, onClose, onResume }) {
   const [secondsLeft, setSecondsLeft] = useState(600); // 10 min
@@ -36,9 +35,9 @@ function RelaxationModal({ show, onClose, onResume }) {
   useEffect(() => {
     if (show) {
       const quotes = [
-        "Relax, breathe, you’re doing great 🌸",
-        "Little breaks make big differences 🌟",
-        "A fresh mind learns faster 🚀",
+        "Relax, breathe, you’re doing great",
+        "Little breaks make big differences",
+        "A fresh mind learns faster",
       ];
       setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
     }
@@ -49,10 +48,9 @@ function RelaxationModal({ show, onClose, onResume }) {
 
   return (
     <div>
-      <FocusTracker timeoutMinutes={2} />
       <Modal show={show} size="lg" centered>
         <Modal.Header>
-          <Modal.Title>🧘 Relaxation Break</Modal.Title>
+          <Modal.Title>Relaxation Break</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p className="text-center text-muted">{quote}</p>
@@ -64,21 +62,21 @@ function RelaxationModal({ show, onClose, onResume }) {
               className="mx-1"
               onClick={() => setActiveTab("game")}
             >
-              🎮 Mini Game
+              Mini Game
             </Button>
             <Button
               variant={activeTab === "video" ? "primary" : "outline-primary"}
               className="mx-1"
               onClick={() => setActiveTab("video")}
             >
-              🎥 Meditation Video
+              Meditation Video
             </Button>
             <Button
               variant={activeTab === "facts" ? "primary" : "outline-primary"}
               className="mx-1"
               onClick={() => setActiveTab("facts")}
             >
-              🤓 Fun Facts
+              Fun Facts
             </Button>
           </div>
 

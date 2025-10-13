@@ -6,7 +6,7 @@ function FocusTracker() {
     let audio = new Audio("/audio/alarm.wav");
     audio.volume = 1.0;
     audio.loop = true; // ✅ Loop the sound until stopped
-
+    
     // Ask for notification + unlock audio on first user action
     const requestPermissions = () => {
       if (Notification.permission !== "granted") {
@@ -26,7 +26,7 @@ function FocusTracker() {
           console.warn("Autoplay blocked until user interacts:", err);
         });
 
-      document.removeEventListener("click", requestPermissions);
+     document.removeEventListener("click", requestPermissions);
     };
 
     document.addEventListener("click", requestPermissions);
@@ -53,8 +53,9 @@ function FocusTracker() {
           }
 
           playSound();
-          alert("Stay Focused!\nYou switched away for 1 minute.");
-          stopSound();
+          if (window.confirm("Stay Focused!\nYou switched away for 1 minute.")) {
+            stopSound();
+          }
         }, 60 * 1000);
       } else {
         clearTimeout(timer);

@@ -1,136 +1,158 @@
-from flask import Blueprint, request, jsonify, session
-from extensions import db, bcrypt
-from models import User
+# routes/auth.py
+from flask import Blueprint, request, jsonify, session, current_app
 from datetime import datetime
-from flask_jwt_extended import (
-    create_access_token, jwt_required, get_jwt_identity
-)
+from db import db
+from models import User, Progress, Reward
+from sqlalchemy import func
 
-auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+auth_bp = Blueprint("auth", __name__)
 
-# --- REGISTER ---
-@auth_bp.route("/register", methods=["POST"])
-def register():
+def update_user_max_spent(user):
+    """
+    Calculate the max daily total timespent for the user using the progress table
+    and update user.max_spent accordingly.
+    """
+    # Sum timespent per date and get the maximum among them for this user
+    # It's equivalent to: SELECT date, SUM(timespent) FROM progress WHERE user_id = X GROUP BY date
+    # then take the max of the summed times.
+    daily_sums = (
+        db.session.query(Progress.date, func.sum(Progress.timespent).label("daily_total"))
+        .filter(Progress.user_id == user.user_id)
+        .group_by(Progress.date)
+        .all()
+    )
+    if not daily_sums:
+        return
+
+    max_total = max([row.daily_total for row in daily_sums]) if daily_sums else 0
+    if user.max_spent is None or max_total > user.max_spent:
+        user.max_spent = int(max_total)
+        db.session.commit()
+
+@auth_bp.route("/signup", methods=["POST"])
+def signup():
     data = request.json
-    username = data.get("username")
-    email = data.get("email")
-    password = data.get("password")
+    if not data:
+        return jsonify({"message": "No input provided"}), 400
 
-    if not username or not email or not password:
-        return jsonify({"error": "Username, email, and password are required"}), 400
+    # Required fields check
+    required_fields = ["firstname", "lastname", "email", "phone_no",
+                       "year", "department", "username", "password"]
 
-    if User.query.filter((User.username == username) | (User.email == email)).first():
-        return jsonify({"error": "Username or email already exists"}), 400
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({"message": f"{field} is required"}), 400
 
-    hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
+    # Check if username already exists
+    if User.query.filter_by(username=data["username"]).first():
+        return jsonify({"message": "Username already taken"}), 400
 
+    # Check if email already exists
+    if User.query.filter_by(email=data["email"]).first():
+        return jsonify({"message": "Email already registered"}), 400
+
+    # Create new user
     new_user = User(
-        username=username,
-        email=email,
-        password=hashed_password,
+        username=data["username"],
+        password=data["password"],
+        firstname=data["firstname"],
+        lastname=data["lastname"],
+        email=data["email"],
+        phone_no=data["phone_no"],
+        year=int(data["year"]),
+        department=data["department"],
         login="no",
-        firstname=data.get("firstname", ""),
-        lastname=data.get("lastname", ""),
-        phone_no=data.get("phone_no", ""),
-        year=data.get("year"),
-        department=data.get("department", ""),
-        datetime=None,
-        max_spent=0.0
+        datetime=datetime.utcnow(),
+        max_spent=0
     )
 
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": "User registered successfully"}), 201
+    # Initialize rewards row for this user
+    reward = Reward(user_id=new_user.user_id, points=0, badges_count=0)
+    db.session.add(reward)
+    db.session.commit()
 
+    return jsonify({"message": "Signup successful", "user_id": new_user.user_id}), 201
 
-# --- LOGIN ---
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.json
-    user = User.query.filter_by(username=data["username"]).first()
+    username = data.get("username")
+    password = data.get("password")
 
-    if user and bcrypt.check_password_hash(user.password, data["password"]):
-        user.login = "yes"
-        user.datetime = datetime.now()
-        db.session.commit()
+    if not username or not password:
+        return jsonify({"message": "Username and password required."}), 400
 
-        # Create JWT token
-        access_token = create_access_token(identity=user.user_id)
-        session['user_id'] = user.id
-        return jsonify({
-            "access_token": access_token,
-            "user_id": user.user_id,
-            "message": "Login successful!"
-        }), 200
-    
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.check_password(password):
+        return jsonify({"message": "Invalid credentials."}), 401
 
-    return jsonify({"message": "Invalid credentials"}), 401
+    # set session
+    session["user_id"] = user.user_id
+
+    # update login status and datetime
+    user.login = "yes"
+    user.datetime = datetime.utcnow()
+    db.session.commit()
+
+    # Update max_spent using progress table
+    try:
+        update_user_max_spent(user)
+    except Exception as e:
+        current_app.logger.error("Failed to update max_spent: %s", e)
+
+    return jsonify({
+        "message": "Login successful!",
+        "user_id": user.user_id
+    }), 200
 
 
 @auth_bp.route("/logout", methods=["POST"])
-@jwt_required()
 def logout():
-    user_id = get_jwt_identity()
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"success": False, "message": "No user logged in"}), 400
+
     user = User.query.get(user_id)
     if not user:
         return jsonify({"success": False, "message": "User not found"}), 404
 
+    # update user status
     user.login = "no"
-    db.session.commit()
-    return jsonify({"success": True, "message": "Logout successful"}), 200
-
-# --- RESET PASSWORD ---
-@auth_bp.route("/reset-password", methods=["POST"])
-def reset_password():
-    data = request.json
-    username = data.get("username")
-    new_password = data.get("new_password")
-
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-
-    user.password = bcrypt.generate_password_hash(new_password).decode("utf-8")
+    user.datetime = datetime.utcnow()  # store logout time
     db.session.commit()
 
-    return jsonify({"message": "Password updated successfully"}), 200
+    # clear session
+    session.clear()
+
+    return jsonify({"success": True, "message": "Logout successful"})
 
 
-# --- PROFILE ---
-@auth_bp.route("/profile", methods=["GET"])
-@jwt_required()
-def profile():
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+@auth_bp.route("/me", methods=["GET"])
+def me():
+    uid = session.get("user_id")
+    if not uid:
+        return jsonify({"authenticated": False}), 200
 
+    user = User.query.get(uid)
     if not user:
-        return jsonify({"error": "User not found"}), 404
+        return jsonify({"authenticated": False}), 200
 
+    # Return the fields you want on frontend
     return jsonify({
-        "username": user.username,
-        "email": user.email,
-        "firstname": user.firstname,
-        "lastname": user.lastname,
-        "phone_no": user.phone_no
+        "authenticated": True,
+        "user": {
+            "user_id": user.user_id,
+            "username": user.username,
+            "firstname": user.firstname,
+            "lastname": user.lastname,
+            "email": user.email,
+            "year": user.year,
+            "department": user.department,
+            "datetime": user.datetime.isoformat() if user.datetime else None,
+            "max_spent": user.max_spent or 0,
+            "login": user.login
+        }
     }), 200
-
-
-# --- UPDATE PROFILE ---
-@auth_bp.route("/profile", methods=["PUT"])
-@jwt_required()
-def update_profile():
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
-
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-
-    data = request.json
-    user.firstname = data.get("firstname", user.firstname)
-    user.lastname = data.get("lastname", user.lastname)
-    user.email = data.get("email", user.email)
-    user.phone_no = data.get("phone_no", user.phone_no)
-
-    db.session.commit()
-    return jsonify({"message": "Profile updated successfully"}), 200

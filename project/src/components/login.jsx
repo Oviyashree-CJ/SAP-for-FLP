@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { loginUser } from "../services/api";
+import { loginUser, getCurrentUser } from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
 import { FaHome, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 import ForgotPassword from "./forgotPassword";
 
 const Login = () => {
@@ -10,6 +12,7 @@ const Login = () => {
     username: "",
     password: "",
   });
+  const { setUser } = useContext(UserContext);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
@@ -31,15 +34,16 @@ const Login = () => {
       setLoading(true);
       const response = await loginUser(formData);
 
-      if (response.data.user_id) {
-      localStorage.setItem("token", response.data.access_token);
-      if (response.data.user_id) {
-        localStorage.setItem("user_id", response.data.user_id);
+      // fetch current user after login
+      const me = await getCurrentUser();
+      if (me.data?.authenticated && me.data.user) {
+        setUser(me.data.user); // ✅ update context
+        sessionStorage.setItem("user", JSON.stringify(me.data.user)); // optional persist
       }
-    }
 
       alert(response.data.message || "Login successful!");
       navigate("/"); // redirect after login
+
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data?.message || "Invalid credentials.");

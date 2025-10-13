@@ -1,31 +1,30 @@
-import { useEffect, useState } from "react";
-import { ProgressBar, Navbar, Nav } from "react-bootstrap";
+import { useContext } from "react";
+import { Navbar, Nav } from "react-bootstrap";
 import { FaCoins, FaAward, FaUserCircle } from "react-icons/fa";
 import { useLocation, Link } from "react-router-dom";
-import { API } from "../services/api";
+import { UserContext } from "../context/UserContext";
+//import API from "../services/api";
 
-const CustomNavbar = ({ overallProgress}) => {
+const CustomNavbar = () => {
   const location = useLocation();
-  const [rewards, setRewards] = useState({ points: 0 });
+  const { user } = useContext(UserContext);
+  //const [points, setPoints] = useState(0);
 
+  // useEffect(() => {
+  //   const fetchRewards = async () => {
+  //     try {
+  //       const res = await API.get("/api/rewards", { withCredentials: true }); 
+  //       // session cookie will be sent automatically
+  //       if (res.data?.points !== undefined) {
+  //         setPoints(res.data.points);
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to fetch rewards:", err);
+  //     }
+  //   };
 
-  useEffect(() => {
-    const fetchRewards = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        const res = await API.get("/api/rewards", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setRewards(res.data);
-      } catch (err) {
-        console.error("Failed to fetch rewards:", err);
-      }
-    };
-
-    fetchRewards();
-  }, []);
+  //   fetchRewards();
+  // }, []);
 
   if (["/auth", "/auth/login", "/auth/signup"].includes(location.pathname)) {
     return null;
@@ -44,24 +43,20 @@ const CustomNavbar = ({ overallProgress}) => {
       </Navbar.Brand>
 
       <div className="ms-auto d-flex gap-3 align-items-center">
-        <span className="mb-1">Progress:</span>
-        <ProgressBar
-            now={overallProgress}
-            label={`${Math.floor(overallProgress)}%`}
-            style={{ width: "250px"}}
-          />
         <div className="text-center">
           <FaCoins size={24} />
-          <div style={{ fontSize: "12px" }}>Points: { rewards.points } </div>
+          <div style={{ fontSize: "12px" }}>Points: {user?.points || 0} </div>
         </div>
         <div className="text-center">
           <FaAward size={24} />
-          <div style={{ fontSize: "12px" }}>Badges</div>
+          <Link to="/badges" style={{ textDecoration: "none", color: "inherit" }}>
+            <div style={{ fontSize: "12px", cursor: "pointer" }}>Badges</div>
+          </Link>
         </div>
         <div className="text-center">
           <Nav.Link as={Link} to="/profile" className="d-flex flex-column align-items-center text-center">
             <FaUserCircle size={28} />
-            <small>Profile</small>
+            <small>{user ? user.username : "Profile"}</small>
           </Nav.Link>
 
 

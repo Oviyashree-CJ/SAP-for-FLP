@@ -1,0 +1,64 @@
+/* ---------------- Navbar Subjects ---------------- */
+.subject-buttons {
+  display: flex;
+  flex-wrap: nowrap; /* keep in a single row */
+  overflow-x: auto;  /* scroll if too many buttons */
+  width: 100%;
+}
+ 
+.subject-buttons::-webkit-scrollbar {
+  display: none;
+}
+ 
+.subject-buttons .btn {
+  flex: 1 1 0; /* each button takes equal width */
+  text-align: center;
+  padding: 0.5rem 0; /* vertical padding only */
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  border: 1px solid #ad11b8ff;
+  background-color: #ad11b8ff;
+  color: white;
+  transition: all 0.2s;
+  white-space: nowrap; /* prevent text wrap */
+}
+ 
+.subject-buttons .btn:hover {
+  background-color: #9a0fb8;
+  border-color: #9a0fb8;
+}
+ 
+.subject-buttons .btn.selected {
+  background-color: white;
+  color: #ad11b8ff;
+  font-weight: 600;
+  border: 1px solid #ad11b8ff;
+}
+ 
+/* ---------------- Action Buttons ---------------- */
+.action-buttons {
+  display: flex;
+  justify-content: center; /* center the buttons */
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+ 
+.action-buttons .btn {
+  background-color: #ad11b8ff;
+  border-color: #ad11b8ff;
+  color: white;
+  transition: all 0.2s;
+}
+ 
+.action-buttons .btn:hover {
+  background-color: #9a0fb8;
+  border-color: #9a0fb8;
+}
+.book-card-img {
+  width: 100%;
+  height: 200px; /* consistent height */
+  object-fit: cover; /* makes the image fill the container without distortion */
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}

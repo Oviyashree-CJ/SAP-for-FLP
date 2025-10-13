@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FaHome } from "react-icons/fa";
+import { FaHome, FaEye, FaEyeSlash } from "react-icons/fa";
 import { signupUser, loginUser } from "../services/api";
 
 const Signup = () => {
@@ -20,6 +20,7 @@ const Signup = () => {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Regex patterns
   const regex = {
@@ -77,11 +78,11 @@ const Signup = () => {
       alert(response.data.message || "Signup successful!");
 
       // auto login
-      const loginRes = await loginUser({
+      await loginUser({
         username: formData.username,
         password: formData.password
       });
-      localStorage.setItem("token", loginRes.data.access_token);
+      
       navigate("/");
 
     } catch (error) {
@@ -211,14 +212,23 @@ const Signup = () => {
 
           <div className="mb-3">
             <label className="form-label fw-semibold">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="form-control"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
+            <div className="input-group">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                className="form-control"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <span
+                className="input-group-text"
+                style={{ cursor: "pointer" }}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
             {errors.password && (
               <div className="text-danger">{errors.password}</div>
             )}

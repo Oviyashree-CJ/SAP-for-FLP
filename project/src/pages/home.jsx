@@ -4,8 +4,12 @@ import { Carousel, Nav, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaRobot } from "react-icons/fa";
 import CustomNavbar from "../components/navbar";
-import SignOut from "../components/signout";
+
+import { useNavigate } from "react-router-dom";
+
 const Home = () => {
+  const navigate = useNavigate();
+   const handleLogin = () => navigate("/auth/login");
   return (
     <div className="d-flex flex-column vh-100">
       <CustomNavbar />
@@ -17,12 +21,12 @@ const Home = () => {
           <h5 className="mb-4">Dashboard</h5>
           <Nav className="flex-column" style={{ fontSize: "18px" }}>
             <Nav.Link href="/scheduler" >Scheduler</Nav.Link>
-            <Nav.Link href="#">Course</Nav.Link>
-            <Nav.Link href="#">Clarification</Nav.Link>
-            <Nav.Link href="#">Achievements</Nav.Link>
-            <Nav.Link href="#">View Progress</Nav.Link>
-            <Nav.Link as="div">
-              <SignOut />
+            <Nav.Link href="/course">Course</Nav.Link>
+            <Nav.Link href="/chatbot">Clarification</Nav.Link>
+            <Nav.Link href="/relax">Relaxation</Nav.Link>
+            <Nav.Link href="/view-progress">View Progress</Nav.Link>
+            <Nav.Link className="text-light btn me-2" onClick={handleLogin} style={{ backgroundColor: "#ad11b8ff" }}>
+                  Login
             </Nav.Link>
 
           </Nav>
@@ -31,66 +35,111 @@ const Home = () => {
         <div className="flex-grow-1 p-4 position-relative">
           <Carousel>
             <Carousel.Item>
-                <div className="d-flex align-items-center justify-content-center bg-light" style={{height: '80vh'}}>
-                <h3>Page 1 Placeholder</h3>
-                </div>
-                <Carousel.Caption>
-                <p>Description for Page 1</p>
-                </Carousel.Caption>
-            </Carousel.Item>
+            {/* Background Image */}
+            <img
+              className="d-block w-100"
+              src="/P6.png"   // replace with your image path
+              alt="First slide"
+              style={{ height: "80vh", objectFit: "fit" }}
+              onClick={() => navigate("/")} // ensures full cover
+            />
+
+
+            {/* Optional Caption */}
+            <Carousel.Caption>
+              <p>dotLearn - A Smart Learning Platform</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+            <Carousel.Item>
+            {/* Background Image */}
+            <img
+              className="d-block w-100"
+              src="/P1.jpg"   // replace with your image path
+              alt="First slide"
+              style={{ height: "80vh", objectFit: "fit" }}
+              onClick={() => navigate("/scheduler")} // ensures full cover
+            />
+
+            {/* Optional Caption */}
+            <Carousel.Caption>
+              <p className="text-dark"> Smart Scheduler</p>
+            </Carousel.Caption>
+          </Carousel.Item>
 
             <Carousel.Item>
-                <div className="d-flex align-items-center justify-content-center bg-secondary text-white" style={{height: '80vh'}}>
-                <h3>Page 2 Placeholder</h3>
-                </div>
-                <Carousel.Caption>
-                <p>Description for Page 2</p>
-                </Carousel.Caption>
-            </Carousel.Item>
+            {/* Background Image */}
+            <img
+              className="d-block w-100"
+              src="/P2.jpg"   // replace with your image path
+              alt="First slide"
+              style={{ height: "80vh", objectFit: "fit" }}
+              onClick={() => navigate("/course")} // ensures full cover
+            />
+
+
+            {/* Optional Caption */}
+            <Carousel.Caption>
+              <p className="text-dark">Courses with study materials</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+
 
             <Carousel.Item>
-                <div className="d-flex align-items-center justify-content-center bg-dark text-white" style={{height: '80vh'}}>
-                <h3>Page 3 Placeholder</h3>
-                </div>
-                <Carousel.Caption>
-                <p>Description for Page 3</p>
-                </Carousel.Caption>
-            </Carousel.Item>
+            {/* Background Image */}
+            <img
+              className="d-block w-100"
+              src="/P3.jpg"   // replace with your image path
+              alt="First slide"
+              style={{ height: "80vh", objectFit: "fit" }} 
+              onClick={() => navigate("/view-progress")}// ensures full cover
+            />
 
-            <Carousel.Item>
-                <div className="d-flex align-items-center justify-content-center bg-info text-dark" style={{height: '80vh'}}>
-                <h3>Page 4 Placeholder</h3>
-                </div>
-                <Carousel.Caption>
-                <p>Description for Page 4</p>
-                </Carousel.Caption>
-            </Carousel.Item>
+            {/* Optional Caption */}
+            <Carousel.Caption>
+              <p className="text-dark">Progress Tracker</p>
+            </Carousel.Caption>
+          </Carousel.Item>
 
-            <Carousel.Item>
-                <div className="d-flex align-items-center justify-content-center bg-warning text-dark" style={{height: '80vh'}}>
-                <h3>Page 5 Placeholder</h3>
-                </div>
-                <Carousel.Caption>
-                <p>Description for Page 5</p>
-                </Carousel.Caption>
-            </Carousel.Item>
 
-            <Carousel.Item>
-                <div className="d-flex align-items-center justify-content-center bg-warning text-dark" style={{height: '80vh'}}>
-                <h3>Page 6 Placeholder</h3>
-                </div>
-                <Carousel.Caption>
-                <p>Description for Page 6</p>
-                </Carousel.Caption>
-            </Carousel.Item>
-        </Carousel>
+           <Carousel.Item>
+            {/* Background Image */}
+            <img
+              className="d-block w-100"
+              src="/P4.jpg"   // replace with your image path
+              alt="First slide"
+              style={{ height: "80vh", objectFit: "fit" }}
+              onClick={() => navigate("/chatbot")} // ensures full cover
+            />
+
+            {/* Optional Caption */}
+            <Carousel.Caption>
+              <p>Chatbot for Clarification</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+
+          <Carousel.Item>
+            {/* Background Image */}
+            <img
+              className="d-block w-100"
+              src="/P5.jpg"   // replace with your image path
+              alt="First slide"
+              style={{ height: "80vh", objectFit: "fit" }}
+              onClick={() => navigate("/relax")} // ensures full cover
+            />
+
+            {/* Optional Caption */}
+            <Carousel.Caption>
+              <p>Relaxation Module</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+          </Carousel>
 
           {/* Chatbot Icon */}
           <Button
             variant="primary"
             className="position-absolute"
             style={{ bottom: "5px", right: "20px", borderRadius: "60%" }}
-          >
+            onClick={() => navigate("/chatbot")}>
             <FaRobot size={26} />
           </Button>
         </div>

@@ -20,7 +20,7 @@ function FunFacts() {
     <div className="text-center">
       <p>{fact}</p>
       <button className="btn btn-info" onClick={nextFact}>
-        🔄 Show Another
+        Show Another
       </button>
     </div>
   );
